@@ -8,7 +8,7 @@ export function Loader({ className, ...props }: LoaderProps) {
   return (
     <span
       {...props}
-      className={cn('i-material-symbols-progress-activity-sharp animate-spin shrink-0', className)}
+      className={cn('i-material-symbols-progress-activity-sharp shrink-0 animate-spin', className)}
     />
   )
 }

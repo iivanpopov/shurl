@@ -11,9 +11,7 @@ export const getLocale = createIsomorphicFn()
     const cookie = await cookieStore.get(COOKIE_NAME)
     return (cookie?.value ?? 'en') as Locale
   })
-  .server(() => {
-    return (getCookie(COOKIE_NAME) ?? 'en') as Locale
-  })
+  .server(() => (getCookie(COOKIE_NAME) ?? 'en') as Locale)
 
 export function setLocale(value: Locale) {
   void cookieStore.set({

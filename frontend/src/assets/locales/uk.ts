@@ -1,0 +1,14 @@
+export default {
+  'input.shorten.placeholder': 'https://google.com/...',
+  'input.shorten.placeholder-alert': 'Введіть URL для скорочення',
+  'button.shorten': 'Скоротити',
+  'button.clear': 'Очистити',
+  'button.copy-shortened.title': 'Скопіювати скороченний URL',
+  'button.copy-shortened.aria-label': 'Скопіювати скороченний URL',
+  'validation.invalid-url': 'Недійсна URL-адреса',
+  'error.server': 'Помилка сервера. Спробуйте ще раз.',
+  'error.network': "Помилка з'єднання з сервером. Спробуйте ще раз.",
+  'error.ratelimit':
+    'Перевищено ліміт частоти запитів. Будь ласка, переконайтеся, що ваш браузер підтримує Google reCAPTCHA v3.',
+  'recaptcha': 'Цей веб-сайт захищено reCAPTCHA',
+}

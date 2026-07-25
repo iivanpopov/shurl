@@ -169,9 +169,7 @@ export const useField = <
     setError(null)
   }
 
-  const focus = () => {
-    return inputRef.current!.focus()
-  }
+  const focus = () => inputRef.current!.focus()
 
   const validate = async (params: UseFieldRegisterParams) => {
     const hasRules =
@@ -206,69 +204,65 @@ export const useField = <
     setError(null)
   }
 
-  const register = (params?: UseFieldRegisterParams) => {
-    return {
-      ref: (node: Input | null) => {
-        const registerParams = { ...optionsRef.current, ...params }
+  const register = (params?: UseFieldRegisterParams) => ({
+    ref: (node: Input | null) => {
+      const registerParams = { ...optionsRef.current, ...params }
 
-        if (!node) {
-          inputRef.current = null
+      if (!node) {
+        inputRef.current = null
+        return
+      }
+
+      inputRef.current = node
+
+      if (initializedRef.current === node) return
+      initializedRef.current = node
+
+      if (registerParams.autoFocus) node.focus()
+      if (registerParams.validateOnMount) void validate(registerParams)
+
+      if (node instanceof HTMLInputElement) {
+        if (node.type === 'radio') {
+          node.defaultChecked = initialValue === node.value
           return
         }
-
-        inputRef.current = node
-
-        if (initializedRef.current === node) return
-        initializedRef.current = node
-
-        if (registerParams.autoFocus) node.focus()
-        if (registerParams.validateOnMount) void validate(registerParams)
-
-        if (node instanceof HTMLInputElement) {
-          if (node.type === 'radio') {
-            node.defaultChecked = initialValue === node.value
-            return
-          }
-          if (node.type === 'checkbox') {
-            node.defaultChecked = Boolean(initialValue)
-            return
-          }
-          node.defaultValue = String(initialValue)
+        if (node.type === 'checkbox') {
+          node.defaultChecked = Boolean(initialValue)
           return
         }
+        node.defaultValue = String(initialValue)
+        return
+      }
 
-        node.value = String(initialValue)
-      },
-      onChange: (async (event) => {
-        const registerParams = { ...optionsRef.current, ...params }
+      node.value = String(initialValue)
+    },
+    onChange: (async (event) => {
+      const registerParams = { ...optionsRef.current, ...params }
 
-        if (watchingRef.current) rerender()
-        setDirty(getValue() !== (initialValue as unknown as Type))
+      if (watchingRef.current) rerender()
+      setDirty(getValue() !== (initialValue as unknown as Type))
 
-        if (registerParams.validateOnChange) await validate(registerParams)
-        if (registerParams.validateOnBlur) setError(null)
+      if (registerParams.validateOnChange) await validate(registerParams)
+      if (registerParams.validateOnBlur) setError(null)
 
-        registerParams.onChange?.(event)
-      }) as ChangeEventHandler<UseFieldElement>,
-      onBlur: (async (event) => {
-        const registerParams = { ...optionsRef.current, ...params }
+      registerParams.onChange?.(event)
+    }) as ChangeEventHandler<UseFieldElement>,
+    onBlur: (async (event) => {
+      const registerParams = { ...optionsRef.current, ...params }
 
-        if (registerParams.validateOnBlur) await validate(registerParams)
-        setTouched(true)
+      if (registerParams.validateOnBlur) await validate(registerParams)
+      setTouched(true)
 
-        registerParams.onBlur?.(event)
-      }) as FocusEventHandler<UseFieldElement>,
-    }
-  }
+      registerParams.onBlur?.(event)
+    }) as FocusEventHandler<UseFieldElement>,
+  })
 
   const watch = () => {
     watchingRef.current = true
     return getValue()
   }
 
-  const clearError = () => {
-    return setError(null)
-  }
+  const clearError = () => setError(null)
 
   return {
     register,

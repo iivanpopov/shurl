@@ -2,14 +2,13 @@ import type { SubmitEventHandler } from 'react'
 
 import { useGoogleReCaptcha } from '@google-recaptcha/react'
 import { useI18n } from '@kanjou/react'
-import { useMutation } from '@tanstack/react-query'
-import { AxiosError, isAxiosError } from 'axios'
 import { useEffect, useRef } from 'react'
 import * as v from 'valibot'
 
+import type { ResponseConfig } from '#/lib/api'
 import type { TimeoutId } from '#/types'
 
-import { postApiShortenMutation } from '#/api/tanstack'
+import { usePostShorten } from '#/api'
 import { validateAdapter } from '#/app/-utils/validate-adapter'
 import { useCopy } from '#/hooks'
 import { useField } from '#/hooks/use-field'
@@ -17,9 +16,7 @@ import { useField } from '#/hooks/use-field'
 const UrlFieldSchema = v.pipe(
   v.string(),
   v.trim(),
-  v.transform((input) => {
-    return /^https?:\/\//i.test(input) ? input : `https://${input}`
-  }),
+  v.transform((input) => (/^https?:\/\//i.test(input) ? input : `https://${input}`)),
   v.url('validation.invalid-url'),
 )
 
@@ -35,7 +32,7 @@ export function useShortenPage() {
     validate: validateAdapter(UrlFieldSchema),
   })
 
-  const shortenMutation = useMutation(postApiShortenMutation())
+  const shortenMutation = usePostShorten()
 
   const timeoutRef = useRef<TimeoutId | undefined>(undefined)
 
@@ -62,12 +59,12 @@ export function useShortenPage() {
     }
 
     try {
-      const googleReCaptchaToken = await googleReCaptcha.executeV3?.('shorten').catch(() => {
-        return undefined
-      })
+      const googleReCaptchaToken = await googleReCaptcha
+        .executeV3?.('shorten')
+        .catch(() => undefined)
 
       const shortenResponse = await shortenMutation.mutateAsync({
-        body: {
+        data: {
           url: /^https?:\/\//i.test(url) ? url : `https://${url}`,
           googleReCaptcha: googleReCaptchaToken,
         },
@@ -75,31 +72,23 @@ export function useShortenPage() {
 
       urlField.setValue(shortenResponse.shortUrl)
       urlField.setError('')
-    } catch (error) {
-      if (!isAxiosError(error)) throw error
-      if (error.code === AxiosError.ERR_NETWORK && window.navigator.onLine) {
-        urlField.setError('error.network')
-      }
-      if (error.code === AxiosError.ERR_NETWORK && !window.navigator.onLine) {
-        urlField.setError('error.offline')
-      }
-      if (error.status === 429) return urlField.setError('error.ratelimit')
-      if (error.status! < 200 || error.status! >= 300) urlField.setError('error.server')
+    } catch (err) {
+      const error = err as ResponseConfig
+
+      if (error?.status === 429) return urlField.setError('error.ratelimit')
+      if (error.status >= 300) return urlField.setError('error.server')
+      urlField.setError('error.network')
     }
   }
 
   const handleCopy = () => {
-    if (shortenMutation.data) void copy(shortenMutation.data.shortUrl)
+    void copy(shortenMutation.data?.shortUrl ?? '')
   }
 
   const url = urlField.watch()
   const isShortened = url === shortenMutation.data?.shortUrl && shortenMutation.isSuccess
 
-  useEffect(() => {
-    return () => {
-      return clearTimeout(timeoutRef.current)
-    }
-  }, [])
+  useEffect(() => () => clearTimeout(timeoutRef.current), [])
 
   return {
     state: {

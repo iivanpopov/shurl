@@ -16,9 +16,7 @@ export class ClickhouseEventTrackerService implements EventTrackerService {
   trackGo(event: GoEvent) {
     void this.clickhouse
       .insert({ table: 'go_events', values: [event], format: 'JSONEachRow' })
-      .catch((error) => {
-        return this.logger.error('{requestId} {error}', { error })
-      })
+      .catch((error) => this.logger.error('{requestId} {error}', { error }))
   }
 }
 

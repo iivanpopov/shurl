@@ -1,0 +1,111 @@
+{
+  "components": {
+    "responses": {
+      "ShortenResponse": {
+        "description": "The shortened URL response.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ShortenResponseBody"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "GoParams": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9]{1,6}$",
+            "description": "The short URL ID."
+          }
+        },
+        "required": ["id"]
+      },
+      "ShortenRouteBody": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The URL to shorten."
+          },
+          "googleReCaptcha": {
+            "type": "string",
+            "description": "Required if you are creating more than 5 links per hour."
+          }
+        },
+        "required": ["url"]
+      },
+      "ShortenResponseBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "originalUrl": {
+            "type": "string"
+          },
+          "shortUrl": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "originalUrl", "shortUrl"],
+        "description": "The shortened URL response body."
+      }
+    }
+  },
+  "info": {
+    "title": "Shurl",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/shorten": {
+      "post": {
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ShortenResponse"
+          }
+        },
+        "summary": "Shorten an URL",
+        "tags": ["Shortener"],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShortenRouteBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/g/{id}": {
+      "get": {
+        "responses": {
+          "302": {
+            "description": "Redirect to the original URL"
+          }
+        },
+        "summary": "Resolve shortened URL",
+        "tags": ["Shortener"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{1,6}$",
+              "description": "The short URL ID."
+            }
+          }
+        ]
+      }
+    }
+  }
+}

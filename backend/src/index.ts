@@ -59,8 +59,6 @@ const application = new Application({
 
 const hono = await application.instantiate()
 
-hono.get('/api/health', (c) => {
-  return c.text('ok')
-})
+hono.get('/api/health', (c) => c.text('ok'))
 
 export default hono
