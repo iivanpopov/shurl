@@ -1,6 +1,6 @@
 import type { ChangeEventHandler, FocusEventHandler, RefObject } from 'react'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useRerender } from './use-rerender'
 
@@ -90,32 +90,6 @@ export interface UseFieldReturn<Input extends UseFieldElement, Value> {
   watch: () => Value
 }
 
-/**
- * @name useField
- * @description - Hook to manage a form field
- * @category State
- * @usage medium
- *
- * @template Value The input value
- * @template Type The input value type
- * @param {Value} [initialValue = ""] Initial value
- * @param {boolean} [options.initialTouched=false] Initial touched state
- * @param {boolean} [options.autoFocus=false] Auto focus
- * @param {boolean} [options.validateOnChange=false] Validate on change
- * @param {boolean} [options.validateOnBlur=false] Validate on blur
- * @param {boolean} [options.validateOnMount=false] Validate on mount
- * @param {string} [options.required] Required validation message
- * @param {object} [options.min] Min value validation
- * @param {object} [options.max] Max value validation
- * @param {object} [options.minLength] Min length validation
- * @param {object} [options.maxLength] Max length validation
- * @param {object} [options.pattern] Pattern validation
- * @param {Function} [options.validate] Custom validation
- * @returns {UseFieldReturn<Value>} An object containing input information
- *
- * @example
- * const { register, getValue, setValue, reset, dirty, error, setError, clearError, touched, focus, watch } = useField();
- */
 export const useField = <
   Input extends UseFieldElement = HTMLInputElement,
   Value extends boolean | number | string = string,
@@ -134,7 +108,9 @@ export const useField = <
   const [error, setError] = useState<string | null>(null)
 
   const optionsRef = useRef(options)
-  optionsRef.current = options
+  useEffect(() => {
+    optionsRef.current = options
+  })
 
   const getValue = () => {
     if (

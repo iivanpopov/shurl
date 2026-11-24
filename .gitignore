@@ -4,5 +4,4 @@ dist
 .nitro
 .tanstack
 .output
-generated
 *.log

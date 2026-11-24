@@ -6,6 +6,7 @@
     "paths": {
       "#/shared/*": ["../shared/src/*"],
       "#/api": ["./generated/api/index.ts"],
+      "#/api/client": ["./generated/api/.kubb/client.ts"],
       "#/*": ["./src/*"]
     },
     "types": ["vite/client", "bun"]

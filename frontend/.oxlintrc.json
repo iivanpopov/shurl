@@ -4,7 +4,7 @@
   "jsPlugins": ["@unocss/eslint-plugin"],
   "plugins": ["react", "jsx-a11y"],
   "rules": {
-    "@unocss/order": ["error", { "unoFunctions": ["cva", "cn"], "unoVariables": ["className"] }],
+    "unocss/order": ["error", { "unoFunctions": ["cva", "cn"], "unoVariables": ["className"] }],
 
     "unicorn/no-document-cookie": "error",
 

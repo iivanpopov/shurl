@@ -130,24 +130,6 @@ export interface UseFormReturn<Values extends Record<string, any>> {
   watch: () => Values
 }
 
-/**
- * @name useForm
- * @description - Hook to manage a form
- * @category State
- * @usage medium
- *
- * @template Values The form values
- * @param {Values} options.initialValues Initial values
- * @param {UseFormResolver<Values>} [options.resolver] Schema resolver
- * @param {keyof Values} [options.autoFocus] Field to focus on mount
- * @param {boolean} [options.validateOnChange=false] Validate on change
- * @param {boolean} [options.validateOnBlur=false] Validate on blur
- * @param {boolean} [options.validateOnMount=false] Validate on mount
- * @returns {UseFormReturn<Values>} An object containing form information
- *
- * @example
- * const form = useForm({ initialValues: { email: '' } });
- */
 export const useForm = <Values extends Record<string, any>>(
   options: UseFormOptions<Values>,
 ): UseFormReturn<Values> => {

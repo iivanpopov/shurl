@@ -1,4 +1,4 @@
-import { kanjou } from '@kanjou/vite'
+import kanjou from '@kanjou/plugin/vite'
 import { devtools as tanstackDevtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
@@ -11,10 +11,7 @@ export default defineConfig(({ command }) => ({
   plugins: [
     tanstackDevtools(),
     unoCss({ mode: command === 'build' ? 'per-module' : 'global' }),
-    kanjou({
-      sourceLocale: './src/assets/locales/en.ts',
-      dts: { outDir: './generated' },
-    }),
+    kanjou(),
     tanstackStart({
       router: {
         routesDirectory: 'app',

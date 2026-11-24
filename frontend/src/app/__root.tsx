@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 
 import { GoogleReCaptchaProvider } from '@google-recaptcha/react'
-import { KanjouProvider } from '@kanjou/react'
+import { TranslateProvider } from '@kanjou/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
@@ -46,9 +46,9 @@ function Root({ children }: { children: ReactNode }) {
       </head>
       <body className="text-foreground font-mono bg-background min-h-screen antialiased selection:bg-selection">
         <GoogleReCaptchaProvider type="v3" siteKey={import.meta.env.VITE_GOOGLE_RECAPTCHA_KEY}>
-          <KanjouProvider locale={locale} messages={messages}>
+          <TranslateProvider locale={locale} messages={messages}>
             {children}
-          </KanjouProvider>
+          </TranslateProvider>
         </GoogleReCaptchaProvider>
         <TanStackDevtools
           plugins={[

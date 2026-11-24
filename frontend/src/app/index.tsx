@@ -1,4 +1,4 @@
-import { useI18n } from '@kanjou/react'
+import { useTranslate } from '@kanjou/react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Button } from '#/components/ui/button'
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/')({
 function RouteComponent() {
   const { state, mutations, functions, features } = useShortenPage()
 
-  const { t } = useI18n()
+  const t = useTranslate()
 
   return (
     <form className="mx-auto pt-48 flex flex-col w-180" onSubmit={functions.handleSubmit}>
@@ -23,7 +23,11 @@ function RouteComponent() {
         <Input
           {...features.urlField.register()}
           disabled={mutations.shorten.isPending}
-          placeholder={t('input.shorten.placeholder')}
+          placeholder={
+            state.isPlaceholderAlert
+              ? t('input.shorten.placeholder-alert')
+              : t('input.shorten.placeholder')
+          }
         />
         <Button
           size="icon-lg"

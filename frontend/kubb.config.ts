@@ -1,29 +1,34 @@
-import type { UserConfig } from '@kubb/core'
-
-import { pluginClient } from '@kubb/plugin-client'
-import { pluginOas } from '@kubb/plugin-oas'
+import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
+import { defineConfig } from 'kubb'
 
-const name = (name: string) => name.replace(/api/gi, '')
+const stripApi = (name: string) => name.replace(/api/gi, '')
 
-export default {
-  input: { path: './openapi.json' },
+export default defineConfig({
+  input: './openapi.json',
   output: {
     path: './generated/api',
     clean: true,
     format: false,
+    barrel: { type: 'named' },
   },
   plugins: [
-    pluginOas(),
     pluginTs(),
-    pluginClient({
-      importPath: '#/lib/api',
-      transformers: { name },
+    pluginFetch({
+      resolver: {
+        name(name) {
+          return this.default.name(stripApi(name))
+        },
+      },
     }),
     pluginReactQuery({
-      client: { importPath: '#/lib/api' },
-      transformers: { name },
+      hooks: true,
+      resolver: {
+        name(name) {
+          return this.default.name(stripApi(name))
+        },
+      },
     }),
   ],
-} satisfies UserConfig
+})

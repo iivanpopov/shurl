@@ -13,9 +13,9 @@ try {
   await clickhouse.command({ query: `CREATE DATABASE ${Bun.env.CLICKHOUSE_DB}` })
 
   console.log('[CH Reset] Database reset successfully')
+  await clickhouse.close()
 } catch (error) {
+  await clickhouse.close()
   console.error('[CH Reset] Failed:', error)
   process.exit(1)
-} finally {
-  await clickhouse.close()
 }

@@ -1,14 +1,13 @@
 import type { SubmitEventHandler } from 'react'
 
 import { useGoogleReCaptcha } from '@google-recaptcha/react'
-import { useI18n } from '@kanjou/react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as v from 'valibot'
 
-import type { ResponseConfig } from '#/lib/api'
 import type { TimeoutId } from '#/types'
 
 import { usePostShorten } from '#/api'
+import { isResponseError } from '#/api/client'
 import { validateAdapter } from '#/app/-utils/validate-adapter'
 import { useCopy } from '#/hooks'
 import { useField } from '#/hooks/use-field'
@@ -21,7 +20,7 @@ const UrlFieldSchema = v.pipe(
 )
 
 export function useShortenPage() {
-  const { t } = useI18n()
+  const [isPlaceholderAlert, setIsPlaceholderAlert] = useState(false)
 
   const googleReCaptcha = useGoogleReCaptcha()
 
@@ -48,11 +47,11 @@ export function useShortenPage() {
     if (!url) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
-      urlField.ref.current!.placeholder = t('input.shorten.placeholder-alert')
+      setIsPlaceholderAlert(true)
       urlField.focus()
 
       timeoutRef.current = setTimeout(() => {
-        urlField.ref.current!.placeholder = t('input.shorten.placeholder')
+        setIsPlaceholderAlert(false)
       }, 1500)
 
       return
@@ -64,7 +63,7 @@ export function useShortenPage() {
         .catch(() => undefined)
 
       const shortenResponse = await shortenMutation.mutateAsync({
-        data: {
+        body: {
           url: /^https?:\/\//i.test(url) ? url : `https://${url}`,
           googleReCaptcha: googleReCaptchaToken,
         },
@@ -72,11 +71,11 @@ export function useShortenPage() {
 
       urlField.setValue(shortenResponse.shortUrl)
       urlField.setError('')
-    } catch (err) {
-      const error = err as ResponseConfig
-
-      if (error?.status === 429) return urlField.setError('error.ratelimit')
-      if (error.status >= 300) return urlField.setError('error.server')
+    } catch (error) {
+      if (isResponseError(error)) {
+        if (error.status === 429) return urlField.setError('error.ratelimit')
+        if (error.status >= 300) return urlField.setError('error.server')
+      }
       urlField.setError('error.network')
     }
   }
@@ -95,6 +94,7 @@ export function useShortenPage() {
       url,
       isCopied,
       isShortened,
+      isPlaceholderAlert,
     },
     mutations: {
       shorten: shortenMutation,
